@@ -78,7 +78,7 @@
     input[type="text"],
     input[type="number"] {
       width: 100%;
-      padding: 12px 48px 12px 12px;
+      padding: 12px 48px 12px 12px; /* extra right padding after arrow */
       border-radius: 12px;
       border: 1px solid #2a3542;
       background: #0d1218;
@@ -119,7 +119,16 @@
       font-family: ui-monospace, Menlo, Consolas, monospace;
     }
 
-    .btnrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; justify-content: center; }
+    .btnrow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      justify-content: center;
+    }
+
+    /* Left-aligned version for top buttons */
+    .btnrow--left { justify-content: flex-start; }
 
     button {
       border: 1px solid #243041;
@@ -250,7 +259,7 @@
           <div class="urlbox">
             <div class="url" id="urlOut">https://culturefly.com/</div>
           </div>
-          <div class="btnrow">
+          <div class="btnrow btnrow--left">
             <button id="copyBtn">Copy URL</button>
             <button id="openBtn">Open URL</button>
             <button class="primary" id="makeBtn">Generate / Refresh Preview</button>
@@ -282,171 +291,226 @@
 </div>
 
 <script>
-const PROPERTIES = ["Alien","Artistocats","Astro Bot","Bob's Burgers","Chainsaw Man","Chucky","Coraline","Corpse Bride","Dr. Seuss Cat in the Hat","Dr. Seuss The Grinch","Dandy's World","Disney Cats","Family Guy","Ghostface","Gremlins","Halloween","How To Train Your Dragon","Invader Zim","Lilo & Stitch","Moana","Molang","Mortal Kombat","Nightmare Before Christmas","One Piece","Powerpuff Girls","Rick & Morty","South Park","Stranger Things","Texas Chainsaw Massacre","The Last of Us","Toy Story","Transformers","Wicked","Winnie the Pooh"];
-const FORM_FACTORS = ["Nooks","Deluxe Vinyl Figure","Mystery Minis (Smols)","6\" Vinyl Figure","4.5\" Vinyl Figures (FLYGUYS)","4.5\" Vinyl Figures w/ Acrylic (FLYGUYS+)","Flip 'Em's","Generic","Bobbleheads","3\" Bobbleheads","Popcorn Bucket","Corner Creature"];
+/* ---------- Data ---------- */
+const PROPERTIES = [
+  "Alien","Alien Remix","Artistocats","Astro Bot","Bob's Burgers","Chainsaw Man","Chucky",
+  "Coraline","Corpse Bride","Dr. Seuss Cat in the Hat","Dr. Seuss The Grinch","Dandy's World",
+  "Disney Cats","Family Guy","Ghostface","Gremlins","Halloween","How To Train Your Dragon",
+  "Invader Zim","Lilo & Stitch","Moana","Molang","Mortal Kombat","Nightmare Before Christmas",
+  "One Piece","Powerpuff Girls","Rick & Morty","South Park","Stranger Things",
+  "Texas Chainsaw Massacre","The Last of Us","Toy Story","Transformers","Wicked","Winnie the Pooh"
+];
 
+const FORM_FACTORS = [
+  "Nooks","Deluxe Vinyl Figure","Mystery Minis (Smols)","6\" Vinyl Figure",
+  "4.5\" Vinyl Figures (FLYGUYS)","4.5\" Vinyl Figures w/ Acrylic (FLYGUYS+)",
+  "Flip 'Em's","Generic","Bobbleheads","3\" Bobbleheads","Popcorn Bucket","Corner Creature"
+];
+
+/* ---------- Utils ---------- */
 function slugify(input){
   if(!input) return "";
-  return input.trim().replace(/&/g," and ").replace(/[“”"]/g,"").replace(/[’']/g,"")
-    .replace(/[()]/g," ").replace(/[^a-zA-Z0-9]+/g,"-").replace(/-+/g,"-")
-    .replace(/^-|-$/g,"").toLowerCase();
+  return input
+    .trim()
+    .replace(/&/g," and ")
+    .replace(/[“”"]/g,"")
+    .replace(/[’']/g,"")
+    .replace(/[()]/g," ")
+    .replace(/[^a-zA-Z0-9]+/g,"-")
+    .replace(/-+/g,"-")
+    .replace(/^-|-$/g,"")
+    .toLowerCase();
 }
 
 function mapFormFactorToSlug(label){
   const Lraw = (label || "").toLowerCase();
   const L = Lraw.replace(/"/g, "");
-  if(L === "generic") return "";
-  if(L.startsWith("6 vinyl figure")) return "6-vinylfigure";
-  if(L.includes("bobblehead")) return "bobblehead";
-  if(L.includes("flyguys")) return "vinylfigure-small";
-  if(L.includes("mystery minis")) return "vinylfigure-mysterymini";
-  if(L.includes("flip") && L.includes("em")) return "flipems";
-  if(L.includes("deluxe") && L.includes("vinyl")) return "vinylfigure-deluxe";
-  if(L.includes("popcorn") && L.includes("bucket")) return "popcornbucket";
-  if(L.includes("corner") && L.includes("creature")) return "cornercreature";
-  if(L === "nooks") return "nook";
+  if (L === "generic") return "";
+  if (L.startsWith("6 vinyl figure")) return "6-vinylfigure";
+  if (L.includes("bobblehead")) return "bobblehead";
+  if (L.includes("flyguys")) return "vinylfigure-small";
+  if (L.includes("mystery minis")) return "vinylfigure-mysterymini";
+  if (L.includes("flip") && L.includes("em")) return "flipems";
+  if (L.includes("deluxe") && L.includes("vinyl")) return "vinylfigure-deluxe";
+  if (L.includes("popcorn") && L.includes("bucket")) return "popcornbucket";
+  if (L.includes("corner") && L.includes("creature")) return "cornercreature";
+  if (L === "nooks") return "nook";
   return slugify(label);
 }
 
-const propertyEl=document.getElementById('property');
-const formFactorEl=document.getElementById('formFactor');
-const artistToggle=document.getElementById('artistToggle');
-const extraEl=document.getElementById('extra');
-const sizeEl=document.getElementById('size');
-const marginEl=document.getElementById('margin');
-const urlOut=document.getElementById('urlOut');
-const qrNode=document.getElementById('qr');
-const qrNote=document.getElementById('qrNote');
+/* ---------- DOM ---------- */
+const propertyEl   = document.getElementById('property');
+const formFactorEl = document.getElementById('formFactor');
+const artistToggle = document.getElementById('artistToggle');
+const extraEl      = document.getElementById('extra');
+const sizeEl       = document.getElementById('size');
+const marginEl     = document.getElementById('margin');
+const urlOut       = document.getElementById('urlOut');
+const qrNode       = document.getElementById('qr');
+const qrNote       = document.getElementById('qrNote');
 
-function addOptions(el,items){items.forEach(v=>{const o=document.createElement('option');o.textContent=v;o.value=v;el.appendChild(o);});}
-addOptions(propertyEl,PROPERTIES);
-addOptions(formFactorEl,FORM_FACTORS);
+function addOptions(el, items){
+  const frag = document.createDocumentFragment();
+  items.forEach(v => {
+    const o = document.createElement('option');
+    o.textContent = v;
+    o.value = v;
+    frag.appendChild(o);
+  });
+  el.appendChild(frag);
+}
+addOptions(propertyEl, PROPERTIES);
+addOptions(formFactorEl, FORM_FACTORS);
 
-function artistOn(){return artistToggle.checked;}
+/* ---------- URL Builder ---------- */
+function artistOn(){ return artistToggle.checked; }
+
 function buildURL(){
-  const base="https://culturefly.com/";
-  const propertySlug=slugify(propertyEl.value||"");
-  let mappedForm=mapFormFactorToSlug(formFactorEl.value||"");
-  const extra=slugify(extraEl.value||"");
-  const isArtist=artistOn();
+  const base = "https://culturefly.com/";
+  const propertySlug = slugify(propertyEl.value || "");
+  let mappedForm = mapFormFactorToSlug(formFactorEl.value || "");
+  const extra = slugify(extraEl.value || "");
+  const isArtist = artistOn();
 
-  let insertedAfterVF=false;
-  if(isArtist && mappedForm && mappedForm.includes("vinylfigure")){
-    mappedForm=mappedForm.replace(/vinylfigure(?!-artist)/,"vinylfigure-artist");
-    insertedAfterVF=true;
+  let insertedAfterVF = false;
+  if (isArtist && mappedForm && mappedForm.includes("vinylfigure")){
+    mappedForm = mappedForm.replace(/vinylfigure(?!-artist)/,"vinylfigure-artist");
+    insertedAfterVF = true;
   }
 
-  const parts=["insertcard",propertySlug];
-  if(mappedForm)parts.push(mappedForm);
-  if(extra)parts.push(extra);
-  if(isArtist && !insertedAfterVF)parts.push("artist");
+  const parts = ["insertcard", propertySlug];
+  if (mappedForm) parts.push(mappedForm);
+  if (extra) parts.push(extra);
+  if (isArtist && !insertedAfterVF) parts.push("artist");
 
-  return base+parts.join("-");
+  return base + parts.join("-");
 }
-function refreshURL(){const url=buildURL();urlOut.textContent=url;return url;}
 
-function qrOptions(size,margin,data,type="svg"){
-  return{
-    width:size,height:size,data,margin,type,
-    qrOptions:{errorCorrectionLevel:"Q"},
-    dotsOptions:{type:"rounded",color:"#000000"},
-    cornersSquareOptions:{type:"extra-rounded",color:"#000000"},
-    cornersDotOptions:{type:"dot",color:"#000000"},
-    backgroundOptions:{color:"#ffffff"}
+function refreshURL(){
+  const url = buildURL();
+  urlOut.textContent = url;
+  return url;
+}
+
+/* ---------- QR ---------- */
+function qrOptions(size, margin, data, type="svg"){
+  return {
+    width: size,
+    height: size,
+    data,
+    margin,
+    type,
+    qrOptions: { errorCorrectionLevel: "Q" },
+    dotsOptions: { type: "rounded", color: "#000000" },
+    cornersSquareOptions: { type: "extra-rounded", color: "#000000" },
+    cornersDotOptions: { type: "dot", color: "#000000" },
+    backgroundOptions: { color: "#ffffff" }
   };
 }
 
-const PREVIEW_SIZE=400;
+const PREVIEW_SIZE = 400;
+
 function makePreview(){
-  const data=refreshURL();
-  const quiet=Math.max(0,Math.min(50,parseInt(marginEl.value||"8",10)));
-  qrNode.innerHTML="";
-  const qr=new QRCodeStyling(qrOptions(PREVIEW_SIZE,quiet,data,"svg"));
+  const data  = refreshURL();
+  const quiet = Math.max(0, Math.min(50, parseInt(marginEl.value || "8", 10)));
+  qrNode.innerHTML = "";
+  const qr = new QRCodeStyling(qrOptions(PREVIEW_SIZE, quiet, data, "svg"));
   qr.append(qrNode);
-  qrNote.textContent="QR generated for: "+data;
+  qrNote.textContent = "QR generated for: " + data;
 }
 
-async function downloadPNG(){
-  const data=refreshURL();
-  const size=parseInt(sizeEl.value||"1200",10);
-  const quiet=parseInt(marginEl.value||"8",10);
-  const qr=new QRCodeStyling(qrOptions(size,quiet,data,"canvas"));
-  const blob=await qr.getRawData("png");
-  triggerDownload(blob,"culturefly-qr.png");
-}
-async function downloadSVG(){
-  const data=refreshURL();
-  const size=parseInt(sizeEl.value||"1200",10);
-  const quiet=parseInt(marginEl.value||"8",10);
-  const qr=new QRCodeStyling(qrOptions(size,quiet,data,"svg"));
-  const blob=await qr.getRawData("svg");
-  triggerDownload(blob,"culturefly-qr.svg");
-}
-async function downloadPDF(){
-  const data=refreshURL();
-  const baseSize=parseInt(sizeEl.value||"1200",10);
-  const quiet=parseInt(marginEl.value||"8",10);
-  const px=baseSize*3;
-  const qr=new QRCodeStyling(qrOptions(px,quiet*3,data,"canvas"));
-  const pngBlob=await qr.getRawData("png");
-  const pngUrl=URL.createObjectURL(pngBlob);
-  const {jsPDF}=window.jspdf;
-  const doc=new jsPDF({orientation:"p",unit:"px",format:[px,px]});
-  await new Promise(res=>{const img=new Image();img.onload=()=>{doc.addImage(img,"PNG",0,0,px,px);res();};img.src=pngUrl;});
-  const pdfBlob=doc.output("blob");
-  triggerDownload(pdfBlob,"culturefly-qr.pdf");
-  URL.revokeObjectURL(pngUrl);
-}
-function triggerDownload(blob,filename){
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=filename;
+/* ---------- Downloads ---------- */
+function triggerDownload(blob, filename){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
-/* ---- COPY FIX ---- */
+async function downloadPNG(){
+  const data  = refreshURL();
+  const size  = parseInt(sizeEl.value || "1200", 10);
+  const quiet = parseInt(marginEl.value || "8", 10);
+  const qr    = new QRCodeStyling(qrOptions(size, quiet, data, "canvas"));
+  const blob  = await qr.getRawData("png");
+  triggerDownload(blob, "culturefly-qr.png");
+}
+
+async function downloadSVG(){
+  const data  = refreshURL();
+  const size  = parseInt(sizeEl.value || "1200", 10);
+  const quiet = parseInt(marginEl.value || "8", 10);
+  const qr    = new QRCodeStyling(qrOptions(size, quiet, data, "svg"));
+  const blob  = await qr.getRawData("svg");
+  triggerDownload(blob, "culturefly-qr.svg");
+}
+
+async function downloadPDF(){
+  const data     = refreshURL();
+  const baseSize = parseInt(sizeEl.value || "1200", 10);
+  const quiet    = parseInt(marginEl.value || "8", 10);
+  const px       = baseSize * 3;
+  const qr       = new QRCodeStyling(qrOptions(px, quiet * 3, data, "canvas"));
+  const pngBlob  = await qr.getRawData("png");
+  const pngUrl   = URL.createObjectURL(pngBlob);
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "p", unit: "px", format: [px, px] });
+  await new Promise(res => {
+    const img = new Image();
+    img.onload = () => { doc.addImage(img, "PNG", 0, 0, px, px); res(); };
+    img.src = pngUrl;
+  });
+  const pdfBlob = doc.output("blob");
+  triggerDownload(pdfBlob, "culturefly-qr.pdf");
+  URL.revokeObjectURL(pngUrl);
+}
+
+/* ---------- Copy (robust) ---------- */
 function copyTextFallback(text){
-  const ta=document.createElement('textarea');
-  ta.value=text;
+  const ta = document.createElement('textarea');
+  ta.value = text;
   ta.setAttribute('readonly','');
-  ta.style.position='absolute';
-  ta.style.left='-9999px';
+  ta.style.position = 'absolute';
+  ta.style.left = '-9999px';
   document.body.appendChild(ta);
   ta.select();
-  try{document.execCommand('copy');}catch(e){}
+  try { document.execCommand('copy'); } catch(e){}
   document.body.removeChild(ta);
 }
 
 async function copyURLToClipboard(){
-  const text=refreshURL();
+  const text = refreshURL();
   try{
-    if(navigator.clipboard && window.isSecureContext){
+    if (navigator.clipboard && window.isSecureContext){
       await navigator.clipboard.writeText(text);
     } else {
       copyTextFallback(text);
     }
-    const btn=document.getElementById('copyBtn');
-    const original=btn.textContent;
-    btn.textContent='Copied!';
-    setTimeout(()=>btn.textContent=original,1200);
+    const btn = document.getElementById('copyBtn');
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = original, 1200);
   }catch(err){
     copyTextFallback(text);
   }
 }
 
-/* ---- BUTTON HOOKS ---- */
-document.getElementById('makeBtn').onclick=makePreview;
-document.getElementById('pngBtn').onclick=downloadPNG;
-document.getElementById('svgBtn').onclick=downloadSVG;
-document.getElementById('pdfBtn').onclick=downloadPDF;
-document.getElementById('copyBtn').onclick=copyURLToClipboard;
-document.getElementById('openBtn').onclick=()=>window.open(refreshURL(),"_blank");
-[propertyEl,formFactorEl,extraEl].forEach(el=>el.addEventListener('change',refreshURL));
-artistToggle.addEventListener('change',refreshURL);
+/* ---------- Events ---------- */
+document.getElementById('makeBtn').onclick = makePreview;
+document.getElementById('pngBtn').onclick  = downloadPNG;
+document.getElementById('svgBtn').onclick  = downloadSVG;
+document.getElementById('pdfBtn').onclick  = downloadPDF;
+document.getElementById('copyBtn').onclick = copyURLToClipboard;
+document.getElementById('openBtn').onclick = () => window.open(refreshURL(), "_blank");
 
+[propertyEl, formFactorEl, extraEl].forEach(el => el.addEventListener('change', refreshURL));
+artistToggle.addEventListener('change', refreshURL);
+
+/* ---------- Init ---------- */
 refreshURL();
 makePreview();
 </script>
