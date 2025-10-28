@@ -35,8 +35,9 @@
       font-family: 'Oswald', sans-serif;
       font-size: 3rem;
       font-weight: 400;
-      font-style:normal;
+      font-style: normal;
       margin-bottom: 20px;
+      text-align: center;
     }
 
     .wrap { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
@@ -69,7 +70,7 @@
     input[type="text"],
     input[type="number"] {
       width: 100%;
-      padding: 12px 48px 12px 12px; /* extra right padding after arrow */
+      padding: 12px 48px 12px 12px;
       border-radius: 12px;
       border: 1px solid #2a3542;
       background: #0d1218;
@@ -110,7 +111,7 @@
       font-family: ui-monospace, Menlo, Consolas, monospace;
     }
 
-    .btnrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .btnrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; justify-content: center; }
 
     button {
       border: 1px solid #243041;
@@ -149,11 +150,11 @@
       height: 100% !important;
     }
 
-    .tiny { font-size: 11px; color: var(--muted); }
+    .tiny { font-size: 11px; color: var(--muted); text-align: center; }
     @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 
-    .toggle-wrap { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
-    .toggle-label { font-size: 12px; color: var(--muted); text-transform: uppercase; margin-top:-3px;}
+    .toggle-wrap { display: flex; align-items: center; gap: 12px; margin-top: 12px; justify-content: flex-start; }
+    .toggle-label { font-size: 12px; color: var(--muted); text-transform: uppercase; margin-top:-3px; }
 
     .switch { position: relative; width: 52px; height: 30px; }
     .switch input { opacity: 0; width: 0; height: 0; }
@@ -257,7 +258,7 @@
 </div>
 
 <script>
-const PROPERTIES = ["Alien","Alien Remix","Artistocats","Astro Bot","Bob's Burgers","Chainsaw Man","Chucky","Coraline","Corpse Bride","Dr. Seuss Cat in the Hat","Dr. Seuss The Grinch","Dandy's World","Disney Cats","Family Guy","Ghostface","Gremlins","Halloween","How To Train Your Dragon","Invader Zim","Lilo & Stitch","Moana","Molang","Mortal Kombat","Nightmare Before Christmas","One Piece","Powerpuff Girls","Rick & Morty","South Park","Stranger Things","Texas Chainsaw Massacre","The Last of Us","Toy Story","Transformers","Uzumaki","Wicked","Winnie the Pooh"];
+const PROPERTIES = ["Alien","Artistocats","Astro Bot","Bob's Burgers","Chainsaw Man","Chucky","Coraline","Corpse Bride","Dr. Seuss Cat in the Hat","Dr. Seuss The Grinch","Dandy's World","Disney Cats","Family Guy","Ghostface","Gremlins","Halloween","How To Train Your Dragon","Invader Zim","Lilo & Stitch","Moana","Molang","Mortal Kombat","Nightmare Before Christmas","One Piece","Powerpuff Girls","Rick & Morty","South Park","Stranger Things","Texas Chainsaw Massacre","The Last of Us","Toy Story","Transformers","Uzumaki","Wicked","Winnie the Pooh"];
 const FORM_FACTORS = ["Nooks","Deluxe Vinyl Figure","Mystery Minis (Smols)","6\" Vinyl Figure","4.5\" Vinyl Figures (FLYGUYS)","4.5\" Vinyl Figures w/ Acrylic (FLYGUYS+)","Flip 'Em's","Generic","Bobbleheads","3\" Bobbleheads","Popcorn Bucket","Corner Creature"];
 
 function slugify(input){
@@ -266,17 +267,20 @@ function slugify(input){
     .replace(/[()]/g," ").replace(/[^a-zA-Z0-9]+/g,"-").replace(/-+/g,"-")
     .replace(/^-|-$/g,"").toLowerCase();
 }
+
 function mapFormFactorToSlug(label){
-  const L=(label||"").toLowerCase();
-  if(L==="generic") return "";
+  const Lraw = (label || "").toLowerCase();
+  const L = Lraw.replace(/"/g, "");
+  if(L === "generic") return "";
+  if(L.startsWith("6 vinyl figure")) return "6-vinylfigure";
   if(L.includes("bobblehead")) return "bobblehead";
   if(L.includes("flyguys")) return "vinylfigure-small";
   if(L.includes("mystery minis")) return "vinylfigure-mysterymini";
-  if(L.includes("flip")&&L.includes("em")) return "flipems";
-  if(L.includes("deluxe")&&L.includes("vinyl")) return "vinylfigure-deluxe";
-  if(L.includes("popcorn")&&L.includes("bucket")) return "popcornbucket";
-  if(L.includes("corner")&&L.includes("creature")) return "cornercreature";
-  if(L==="nooks") return "nook";
+  if(L.includes("flip") && L.includes("em")) return "flipems";
+  if(L.includes("deluxe") && L.includes("vinyl")) return "vinylfigure-deluxe";
+  if(L.includes("popcorn") && L.includes("bucket")) return "popcornbucket";
+  if(L.includes("corner") && L.includes("creature")) return "cornercreature";
+  if(L === "nooks") return "nook";
   return slugify(label);
 }
 
@@ -303,8 +307,8 @@ function buildURL(){
   const isArtist=artistOn();
 
   let insertedAfterVF=false;
-  if(isArtist && mappedForm && /^vinylfigure(\b|-)/.test(mappedForm)){
-    mappedForm=mappedForm.replace(/^vinylfigure(\b|-)/,"vinylfigure-artist$1");
+  if(isArtist && mappedForm && mappedForm.includes("vinylfigure")){
+    mappedForm=mappedForm.replace(/vinylfigure(?!-artist)/,"vinylfigure-artist");
     insertedAfterVF=true;
   }
 
