@@ -35,13 +35,21 @@
       font-family: 'Oswald', sans-serif;
       font-size: 3rem;
       font-weight: 400;
-      font-style: normal;
       margin-bottom: 20px;
       text-align: left;
     }
 
-    .wrap { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-    .grid { display: grid; gap: 18px; grid-template-columns: 1.2fr .8fr; }
+    .wrap {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px 60px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1.2fr .8fr;
+    }
 
     .card {
       background: var(--card);
@@ -183,6 +191,17 @@
 
     .switch input:checked + .slider { background: #1f2b3d; }
     .switch input:checked + .slider:before { transform: translateX(22px); }
+
+    .footer-logo {
+      margin-top: 60px;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .footer-logo img {
+      width: 160px;
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body>
@@ -255,10 +274,15 @@
       </div>
     </div>
   </div>
+
+  <!-- Footer logo -->
+  <div class="footer-logo">
+    <img src="https://cdn.shopify.com/s/files/1/1393/2767/files/cf-builtby-stamp-01.svg" alt="Built by CultureFly">
+  </div>
 </div>
 
 <script>
-const PROPERTIES = ["Alien","Artistocats","Astro Bot","Bob's Burgers","Chainsaw Man","Chucky","Coraline","Corpse Bride","Dr. Seuss Cat in the Hat","Dr. Seuss The Grinch","Dandy's World","Disney Cats","Family Guy","Ghostface","Gremlins","Halloween","How To Train Your Dragon","Invader Zim","Lilo & Stitch","Moana","Molang","Mortal Kombat","Nightmare Before Christmas","One Piece","Powerpuff Girls","Rick & Morty","South Park","Stranger Things","Texas Chainsaw Massacre","The Last of Us","Toy Story","Transformers","Uzumaki","Wicked","Winnie the Pooh"];
+const PROPERTIES = ["Alien","Artistocats","Astro Bot","Bob's Burgers","Chainsaw Man","Chucky","Coraline","Corpse Bride","Dr. Seuss Cat in the Hat","Dr. Seuss The Grinch","Dandy's World","Disney Cats","Family Guy","Ghostface","Gremlins","Halloween","How To Train Your Dragon","Invader Zim","Lilo & Stitch","Moana","Molang","Mortal Kombat","Nightmare Before Christmas","One Piece","Powerpuff Girls","Rick & Morty","South Park","Stranger Things","Texas Chainsaw Massacre","The Last of Us","Toy Story","Transformers","Wicked","Winnie the Pooh"];
 const FORM_FACTORS = ["Nooks","Deluxe Vinyl Figure","Mystery Minis (Smols)","6\" Vinyl Figure","4.5\" Vinyl Figures (FLYGUYS)","4.5\" Vinyl Figures w/ Acrylic (FLYGUYS+)","Flip 'Em's","Generic","Bobbleheads","3\" Bobbleheads","Popcorn Bucket","Corner Creature"];
 
 function slugify(input){
@@ -383,11 +407,42 @@ function triggerDownload(blob,filename){
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
 
+/* ---- COPY FIX ---- */
+function copyTextFallback(text){
+  const ta=document.createElement('textarea');
+  ta.value=text;
+  ta.setAttribute('readonly','');
+  ta.style.position='absolute';
+  ta.style.left='-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta);
+}
+
+async function copyURLToClipboard(){
+  const text=refreshURL();
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+    } else {
+      copyTextFallback(text);
+    }
+    const btn=document.getElementById('copyBtn');
+    const original=btn.textContent;
+    btn.textContent='Copied!';
+    setTimeout(()=>btn.textContent=original,1200);
+  }catch(err){
+    copyTextFallback(text);
+  }
+}
+
+/* ---- BUTTON HOOKS ---- */
 document.getElementById('makeBtn').onclick=makePreview;
 document.getElementById('pngBtn').onclick=downloadPNG;
 document.getElementById('svgBtn').onclick=downloadSVG;
 document.getElementById('pdfBtn').onclick=downloadPDF;
-document.getElementById('copyBtn').onclick=()=>navigator.clipboard.writeText(refreshURL());
+document.getElementById('copyBtn').onclick=copyURLToClipboard;
 document.getElementById('openBtn').onclick=()=>window.open(refreshURL(),"_blank");
 [propertyEl,formFactorEl,extraEl].forEach(el=>el.addEventListener('change',refreshURL));
 artistToggle.addEventListener('change',refreshURL);
