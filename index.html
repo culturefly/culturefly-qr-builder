@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>CultureFly QR Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Rubik:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- qr-code-styling -->
+  <script src="https://unpkg.com/qr-code-styling@1.8.2/lib/qr-code-styling.js"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+
+  <style>
+    :root {
+      --bg: #0b0d10;
+      --card: #12161b;
+      --ink: #e9eef4;
+      --muted: #a7b2bf;
+      --radius: 16px;
+      --accent: #1f2b3d;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: linear-gradient(120deg, #0b0d10 0%, #111720 100%);
+      color: var(--ink);
+      font-family: 'Rubik', sans-serif;
+    }
+
+    h1 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 3rem;
+      font-weight: 400;
+      font-style:normal;
+      margin-bottom: 20px;
+    }
+
+    .wrap { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+    .grid { display: grid; gap: 18px; grid-template-columns: 1.2fr .8fr; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid #1e2530;
+      border-radius: var(--radius);
+    }
+
+    .card header {
+      padding: 14px 16px;
+      border-bottom: 1px solid #1e2530;
+      font-weight: 600;
+    }
+
+    .card .content { padding: 16px; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    select,
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 48px 12px 12px; /* extra right padding after arrow */
+      border-radius: 12px;
+      border: 1px solid #2a3542;
+      background: #0d1218;
+      color: var(--ink);
+      font-family: 'Rubik', sans-serif;
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url('data:image/svg+xml;utf8,\
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="%23a7b2bf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 14px;
+    }
+
+    select:focus,
+    input:focus {
+      outline: 2px solid #2a3542;
+      outline-offset: 2px;
+    }
+
+    .row { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+    .row3 { display: grid; gap: 14px; grid-template-columns: 1fr 1fr 1fr; }
+
+    .urlbox {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      align-items: center;
+    }
+
+    .url {
+      flex: 1;
+      background: #0d1218;
+      border: 1px solid #2a3542;
+      border-radius: 12px;
+      padding: 12px 14px;
+      overflow: auto;
+      font-family: ui-monospace, Menlo, Consolas, monospace;
+    }
+
+    .btnrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+
+    button {
+      border: 1px solid #243041;
+      background: #121721;
+      color: var(--ink);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    button.primary { background: #182332; }
+
+    .qrWrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #qr {
+      width: 400px;
+      height: 400px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #qr > svg,
+    #qr > canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .tiny { font-size: 11px; color: var(--muted); }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+    .toggle-wrap { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+    .toggle-label { font-size: 12px; color: var(--muted); text-transform: uppercase; margin-top:-3px;}
+
+    .switch { position: relative; width: 52px; height: 30px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background: #0d1218;
+      border: 1px solid #2a3542;
+      border-radius: 999px;
+      transition: background .2s;
+    }
+
+    .slider:before {
+      content: "";
+      position: absolute;
+      height: 22px;
+      width: 22px;
+      left: 5px;
+      top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: transform .2s;
+    }
+
+    .switch input:checked + .slider { background: #1f2b3d; }
+    .switch input:checked + .slider:before { transform: translateX(22px); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>CultureFly QR Builder</h1>
+  <div class="grid">
+    <div class="card">
+      <header>Build URL</header>
+      <div class="content">
+        <div class="row">
+          <div>
+            <label for="property">Property</label>
+            <select id="property"></select>
+          </div>
+          <div>
+            <label for="formFactor">Form Factor</label>
+            <select id="formFactor"></select>
+          </div>
+        </div>
+
+        <div class="toggle-wrap">
+          <span class="toggle-label">Artist Series</span>
+          <label class="switch">
+            <input type="checkbox" id="artistToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="row3" style="margin-top:14px">
+          <div>
+            <label for="extra">Additional Parameter</label>
+            <input id="extra" type="text" placeholder="e.g. promo, nycc-2025" />
+          </div>
+          <div>
+            <label for="size">Export size (px)</label>
+            <input id="size" type="number" min="256" max="4096" step="32" value="1200" />
+          </div>
+          <div>
+            <label for="margin">Quiet zone (px)</label>
+            <input id="margin" type="number" min="0" max="50" step="1" value="8" />
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <label>Resulting URL</label>
+          <div class="urlbox">
+            <div class="url" id="urlOut">https://culturefly.com/</div>
+          </div>
+          <div class="btnrow">
+            <button id="copyBtn">Copy URL</button>
+            <button id="openBtn">Open URL</button>
+            <button class="primary" id="makeBtn">Generate / Refresh Preview</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <header>QR Preview</header>
+      <div class="content">
+        <div class="qrWrap">
+          <div id="qr"></div>
+          <div class="tiny" id="qrNote">QR will appear here.</div>
+          <div class="btnrow">
+            <button id="pngBtn">Download PNG</button>
+            <button id="svgBtn">Download SVG</button>
+            <button id="pdfBtn">Download PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PROPERTIES = ["Alien","Alien Remix","Artistocats","Astro Bot","Bob's Burgers","Chainsaw Man","Chucky","Coraline","Corpse Bride","Dr. Seuss Cat in the Hat","Dr. Seuss The Grinch","Dandy's World","Disney Cats","Family Guy","Ghostface","Gremlins","Halloween","How To Train Your Dragon","Invader Zim","Lilo & Stitch","Moana","Molang","Mortal Kombat","Nightmare Before Christmas","One Piece","Powerpuff Girls","Rick & Morty","South Park","Stranger Things","Texas Chainsaw Massacre","The Last of Us","Toy Story","Transformers","Uzumaki","Wicked","Winnie the Pooh"];
+const FORM_FACTORS = ["Nooks","Deluxe Vinyl Figure","Mystery Minis (Smols)","6\" Vinyl Figure","4.5\" Vinyl Figures (FLYGUYS)","4.5\" Vinyl Figures w/ Acrylic (FLYGUYS+)","Flip 'Em's","Generic","Bobbleheads","3\" Bobbleheads","Popcorn Bucket","Corner Creature"];
+
+function slugify(input){
+  if(!input) return "";
+  return input.trim().replace(/&/g," and ").replace(/[“”"]/g,"").replace(/[’']/g,"")
+    .replace(/[()]/g," ").replace(/[^a-zA-Z0-9]+/g,"-").replace(/-+/g,"-")
+    .replace(/^-|-$/g,"").toLowerCase();
+}
+function mapFormFactorToSlug(label){
+  const L=(label||"").toLowerCase();
+  if(L==="generic") return "";
+  if(L.includes("bobblehead")) return "bobblehead";
+  if(L.includes("flyguys")) return "vinylfigure-small";
+  if(L.includes("mystery minis")) return "vinylfigure-mysterymini";
+  if(L.includes("flip")&&L.includes("em")) return "flipems";
+  if(L.includes("deluxe")&&L.includes("vinyl")) return "vinylfigure-deluxe";
+  if(L.includes("popcorn")&&L.includes("bucket")) return "popcornbucket";
+  if(L.includes("corner")&&L.includes("creature")) return "cornercreature";
+  if(L==="nooks") return "nook";
+  return slugify(label);
+}
+
+const propertyEl=document.getElementById('property');
+const formFactorEl=document.getElementById('formFactor');
+const artistToggle=document.getElementById('artistToggle');
+const extraEl=document.getElementById('extra');
+const sizeEl=document.getElementById('size');
+const marginEl=document.getElementById('margin');
+const urlOut=document.getElementById('urlOut');
+const qrNode=document.getElementById('qr');
+const qrNote=document.getElementById('qrNote');
+
+function addOptions(el,items){items.forEach(v=>{const o=document.createElement('option');o.textContent=v;o.value=v;el.appendChild(o);});}
+addOptions(propertyEl,PROPERTIES);
+addOptions(formFactorEl,FORM_FACTORS);
+
+function artistOn(){return artistToggle.checked;}
+function buildURL(){
+  const base="https://culturefly.com/";
+  const propertySlug=slugify(propertyEl.value||"");
+  let mappedForm=mapFormFactorToSlug(formFactorEl.value||"");
+  const extra=slugify(extraEl.value||"");
+  const isArtist=artistOn();
+
+  let insertedAfterVF=false;
+  if(isArtist && mappedForm && /^vinylfigure(\b|-)/.test(mappedForm)){
+    mappedForm=mappedForm.replace(/^vinylfigure(\b|-)/,"vinylfigure-artist$1");
+    insertedAfterVF=true;
+  }
+
+  const parts=["insertcard",propertySlug];
+  if(mappedForm)parts.push(mappedForm);
+  if(extra)parts.push(extra);
+  if(isArtist && !insertedAfterVF)parts.push("artist");
+
+  return base+parts.join("-");
+}
+function refreshURL(){const url=buildURL();urlOut.textContent=url;return url;}
+
+function qrOptions(size,margin,data,type="svg"){
+  return{
+    width:size,height:size,data,margin,type,
+    qrOptions:{errorCorrectionLevel:"Q"},
+    dotsOptions:{type:"rounded",color:"#000000"},
+    cornersSquareOptions:{type:"extra-rounded",color:"#000000"},
+    cornersDotOptions:{type:"dot",color:"#000000"},
+    backgroundOptions:{color:"#ffffff"}
+  };
+}
+
+const PREVIEW_SIZE=400;
+function makePreview(){
+  const data=refreshURL();
+  const quiet=Math.max(0,Math.min(50,parseInt(marginEl.value||"8",10)));
+  qrNode.innerHTML="";
+  const qr=new QRCodeStyling(qrOptions(PREVIEW_SIZE,quiet,data,"svg"));
+  qr.append(qrNode);
+  qrNote.textContent="QR generated for: "+data;
+}
+
+async function downloadPNG(){
+  const data=refreshURL();
+  const size=parseInt(sizeEl.value||"1200",10);
+  const quiet=parseInt(marginEl.value||"8",10);
+  const qr=new QRCodeStyling(qrOptions(size,quiet,data,"canvas"));
+  const blob=await qr.getRawData("png");
+  triggerDownload(blob,"culturefly-qr.png");
+}
+async function downloadSVG(){
+  const data=refreshURL();
+  const size=parseInt(sizeEl.value||"1200",10);
+  const quiet=parseInt(marginEl.value||"8",10);
+  const qr=new QRCodeStyling(qrOptions(size,quiet,data,"svg"));
+  const blob=await qr.getRawData("svg");
+  triggerDownload(blob,"culturefly-qr.svg");
+}
+async function downloadPDF(){
+  const data=refreshURL();
+  const baseSize=parseInt(sizeEl.value||"1200",10);
+  const quiet=parseInt(marginEl.value||"8",10);
+  const px=baseSize*3;
+  const qr=new QRCodeStyling(qrOptions(px,quiet*3,data,"canvas"));
+  const pngBlob=await qr.getRawData("png");
+  const pngUrl=URL.createObjectURL(pngBlob);
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:"p",unit:"px",format:[px,px]});
+  await new Promise(res=>{const img=new Image();img.onload=()=>{doc.addImage(img,"PNG",0,0,px,px);res();};img.src=pngUrl;});
+  const pdfBlob=doc.output("blob");
+  triggerDownload(pdfBlob,"culturefly-qr.pdf");
+  URL.revokeObjectURL(pngUrl);
+}
+function triggerDownload(blob,filename){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+document.getElementById('makeBtn').onclick=makePreview;
+document.getElementById('pngBtn').onclick=downloadPNG;
+document.getElementById('svgBtn').onclick=downloadSVG;
+document.getElementById('pdfBtn').onclick=downloadPDF;
+document.getElementById('copyBtn').onclick=()=>navigator.clipboard.writeText(refreshURL());
+document.getElementById('openBtn').onclick=()=>window.open(refreshURL(),"_blank");
+[propertyEl,formFactorEl,extraEl].forEach(el=>el.addEventListener('change',refreshURL));
+artistToggle.addEventListener('change',refreshURL);
+
+refreshURL();
+makePreview();
+</script>
+</body>
+</html>
