@@ -22,17 +22,8 @@
       --radius: 16px;
       --accent: #1f2b3d;
 
-      /* Glow-only vars */
       --glow-hue: 222deg;
-      --shadow-hue: 180deg;
       --spring-duration: 1.33s;
-      --spring-easing: linear(
-        0, 0.002, 0.01 0.9%, 0.038 1.8%, 0.156, 0.312 5.8%, 0.789 11.1%, 1.015 14.2%,
-        1.096, 1.157, 1.199, 1.224 20.3%, 1.231, 1.231, 1.226, 1.214 24.6%,
-        1.176 26.9%, 1.057 32.6%, 1.007 35.5%, 0.984, 0.968, 0.956, 0.949 42%,
-        0.946 44.1%, 0.95 46.5%, 0.998 57.2%, 1.007, 1.011 63.3%, 1.012 68.3%,
-        0.998 84%, 1
-      );
     }
 
     @property --shimmer {
@@ -40,21 +31,9 @@
       inherits: false;
       initial-value: 33deg;
     }
-
-    @keyframes shimmer {
-      0% { --shimmer: 0deg; }
-      100% { --shimmer: 360deg; }
-    }
-    @keyframes shine {
-      0% { opacity: 0; }
-      15% { opacity: 1; }
-      55% { opacity: 1; }
-      100% { opacity: 0; }
-    }
-    @keyframes text {
-      0% { background-position: 100% center; }
-      100% { background-position: -100% center; }
-    }
+    @keyframes shimmer { 0% { --shimmer: 0deg; } 100% { --shimmer: 360deg; } }
+    @keyframes shine { 0% {opacity:0;} 15% {opacity:1;} 55% {opacity:1;} 100% {opacity:0;} }
+    @keyframes text { 0% {background-position: 100% center;} 100% {background-position: -100% center;} }
 
     * { box-sizing: border-box; }
     body {
@@ -69,16 +48,13 @@
       font-size: 3.3rem;
       font-weight: 400 !important;
       text-align: left;
-      margin-bottom: 0px;
+      margin-bottom: 0;
     }
-    
     .sub-header{
       font-size: 11px;
       color: var(--muted);
       text-align: left;
-      font-family: 'Rubik', sans-serif;
-      margin-top:0px;
-      margin-bottom: 24px;
+      margin: 0 0 24px 0;
       text-transform:uppercase;
     }
 
@@ -93,19 +69,18 @@
       gap: 18px;
       grid-template-columns: 1.2fr .8fr;
     }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 
     .card {
       background: var(--card);
       border: 1px solid #1e2530;
       border-radius: var(--radius);
     }
-
     .card header {
       padding: 14px 16px;
       border-bottom: 1px solid #1e2530;
       font-weight: 600;
     }
-
     .card .content { padding: 16px; }
 
     label {
@@ -117,11 +92,9 @@
       font-family: 'Rubik', sans-serif;
     }
 
-    select,
-    input[type="text"],
-    input[type="number"] {
+    select, input[type="text"], input[type="number"] {
       width: 100%;
-      padding: 12px 28px 12px 12px; /* extra right padding after arrow */
+      padding: 12px 28px 12px 12px;
       border-radius: 8px;
       border: 1px solid #2a3542;
       background: #0d1218;
@@ -135,23 +108,12 @@
       background-position: right 8px center;
       background-size: 14px;
     }
-
-    select:focus,
-    input:focus {
-      outline: 2px solid #2a3542;
-      outline-offset: 2px;
-    }
+    select:focus, input:focus { outline: 2px solid #2a3542; outline-offset: 2px; }
 
     .row { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
     .row3 { display: grid; gap: 14px; grid-template-columns: 1fr 1fr 1fr; }
 
-    .urlbox {
-      display: flex;
-      gap: 10px;
-      margin-top: 8px;
-      align-items: center;
-    }
-
+    .urlbox { display: flex; gap: 10px; margin-top: 8px; align-items: center; }
     .url {
       flex: 1;
       background: #05070a;
@@ -163,15 +125,7 @@
       word-break: break-all;
     }
 
-    .btnrow {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      justify-content: center;
-    }
-
-    /* Left-aligned version for top buttons */
+    .btnrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; justify-content: center; }
     .btnrow--left { justify-content: flex-start; }
 
     button {
@@ -184,230 +138,115 @@
       font-weight: 600;
       font-family: 'Rubik', sans-serif;
     }
-    
-    button:hover{
-      background: #243041;
-    }
-
+    button:hover { background: #243041; }
     button.primary { background: #182332; }
 
-    .qrWrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
+    .qrWrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
     #qr {
-      width: 400px;
-      height: 400px;
-      background: #fff;
-      padding: 10px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 400px; height: 400px; background: #fff; padding: 10px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
     }
-
-    #qr > svg,
-    #qr > canvas {
-      width: 100% !important;
-      height: 100% !important;
-    }
-
+    #qr > svg, #qr > canvas { width: 100% !important; height: 100% !important; }
     .tiny { font-size: 11px; color: var(--muted); text-align: center; }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 
     .toggle-wrap { display: flex; align-items: center; gap: 12px; margin-top: 12px; justify-content: flex-start; }
     .toggle-label { font-size: 12px; color: var(--muted); text-transform: uppercase; margin-top:-3px; }
-
     .switch { position: relative; width: 52px; height: 30px; }
     .switch input { opacity: 0; width: 0; height: 0; }
-
     .slider {
-      position: absolute;
-      cursor: pointer;
-      inset: 0;
-      background: #05070a;
-      border: 1px solid #2a3542;
-      border-radius: 999px;
-      transition: background .2s;
+      position: absolute; inset: 0; cursor: pointer;
+      background: #05070a; border: 1px solid #2a3542; border-radius: 999px; transition: background .2s;
     }
-
     .slider:before {
-      content: "";
-      position: absolute;
-      height: 20px;
-      width: 20px;
-      left: 4px;
-      top: 4px;
-      background: white;
-      border-radius: 50%;
-      transition: transform .2s;
+      content: ""; position: absolute; height: 20px; width: 20px; left: 4px; top: 4px;
+      background: white; border-radius: 50%; transition: transform .2s;
     }
-
     .switch input:checked + .slider { background: #1f2b3d; }
     .switch input:checked + .slider:before { transform: translateX(22px); }
 
-    .footer-logo {
-      margin-top: 50px;
-      display: flex;
-      justify-content: flex-start;
-    }
+    .footer-logo { margin-top: 50px; display: flex; justify-content: flex-start; }
+    .footer-logo img { width: 120px; opacity: 0.9; }
 
-    .footer-logo img {
-      width: 120px;
-      opacity: 0.9;
-    }
-
-    /* Details (Advanced) */
-    details.advanced {
-      border-top: 1px solid #1e2530;
-      margin-top: 16px;
-      padding-top: 12px;
-    }
+    details.advanced { border-top: 1px solid #1e2530; margin-top: 16px; padding-top: 12px; }
     details.advanced summary {
-      list-style: none;
-      cursor: pointer;
-      font-weight: 600;
-      padding: 10px 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      list-style: none; cursor: pointer; font-weight: 600; padding: 10px 0;
+      display: flex; align-items: center; gap: 8px;
     }
     details.advanced summary::before {
-      content: "▸";
-      font-size: 14px;
-      color: var(--muted);
-      transform: translateY(-1px);
-      transition: transform .2s;
+      content: "▸"; font-size: 14px; color: var(--muted); transform: translateY(-1px); transition: transform .2s;
     }
     details.advanced[open] summary::before { transform: rotate(90deg) translateX(-2px); }
-
     .muted { color: var(--muted); font-size: 12px; }
 
-    .row2-3 {
-      display: grid; gap: 14px; grid-template-columns: 1fr 1fr 1fr;
-    }
+    .row2-3 { display: grid; gap: 14px; grid-template-columns: 1fr 1fr 1fr; }
+    .kv-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-top: 10px; }
+    .kv-row button { white-space: nowrap; }
 
-    .kv-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    .kv-row button {
-      white-space: nowrap;
-    }
-
-    /* -----------------------------
-       Scoped glow styles (.glow-btn)
-       ----------------------------- */
-    .glow-btn {
-      --inset: 40px; /* size of glow field beyond edges */
-      position: relative;
-      isolation: isolate;
-      color: #ffffff !important;
-      background: #121721;
-      padding: .8em 1.4em;
-      border-radius: 80px;
-    }
-    .glow-btn:hover:not(:active),
-    .glow-btn.active {
-      transition-duration: calc(var(--spring-duration)*0.5);
-      box-shadow:
-        0 4px 8px -2px hsl(var(--glow-hue) 50% 20% / 50%),
-        inset 0 0 0 transparent;
-    }
-    .glow-btn:active {
-      transition-duration: calc(var(--spring-duration)*0.5);
-    }
-
+    /* Glow button */
+    .glow-btn { --inset: 40px; position: relative; isolation: isolate; color: #fff !important; background: #121721; padding: .8em 1.4em; border-radius: 80px; }
+    .glow-btn:hover:not(:active) { box-shadow: 0 4px 8px -2px hsl(var(--glow-hue) 50% 20% / 50%); }
     .glow-btn .shimmer {
-      position: absolute;
-      inset: calc(var(--inset) * -1);
-      border-radius: inherit;
-      pointer-events: none;
-      mask-image: conic-gradient(
-        from var(--shimmer, 0deg),
-        transparent 0%,
-        transparent 20%,
-        black 36%,
-        black 45%,
-        transparent 50%,
-        transparent 70%,
-        black 85%,
-        black 95%,
-        transparent 100%
-      );
-      mask-size: cover;
-      mix-blend-mode: plus-lighter;
-      animation: shimmer 1s linear infinite both;
-      z-index: 1;
+      position: absolute; inset: calc(var(--inset) * -1); border-radius: inherit; pointer-events: none;
+      mask-image: conic-gradient(from var(--shimmer,0deg), transparent 0% 20%, black 36% 45%, transparent 50% 70%, black 85% 95%, transparent 100%);
+      mix-blend-mode: plus-lighter; animation: shimmer 1s linear infinite both; z-index: 1;
     }
-    .glow-btn:hover .shimmer::before,
-    .glow-btn:hover .shimmer::after,
-    .glow-btn.active .shimmer::before,
-    .glow-btn.active .shimmer::after {
-      opacity: 1;
-      animation: shine 1.2s ease-in 1 forwards;
-    }
-    .glow-btn .shimmer::before,
-    .glow-btn .shimmer::after {
-      transition: all 0.5s ease;
-      opacity: 0;
-      content: "";
-      border-radius: inherit;
-      position: absolute;
-      mix-blend-mode: color;
-      inset: var(--inset);
-      pointer-events: none;
+    .glow-btn:hover .shimmer::before, .glow-btn:hover .shimmer::after { opacity: 1; animation: shine 1.2s ease-in 1 forwards; }
+    .glow-btn .shimmer::before, .glow-btn .shimmer::after {
+      opacity: 0; content: ""; border-radius: inherit; position: absolute; inset: var(--inset); pointer-events: none; transition: all .5s ease;
     }
     .glow-btn .shimmer::before {
-      box-shadow:
-        0 0 calc(var(--inset) * 0.1)  2px hsl(var(--glow-hue) 20% 95%),
-        0 0 calc(var(--inset) * 0.18)  4px hsl(var(--glow-hue) 20% 80%),
-        0 0 calc(var(--inset) * 0.33)  4px hsl(var(--glow-hue) 50% 70%),
-        0 0 calc(var(--inset) * 0.66) 5px hsl(var(--glow-hue) 100% 70%);
-      z-index: -1;
+      box-shadow: 0 0 calc(var(--inset)*0.1) 2px hsl(var(--glow-hue) 20% 95%),
+                  0 0 calc(var(--inset)*0.18) 4px hsl(var(--glow-hue) 20% 80%),
+                  0 0 calc(var(--inset)*0.33) 4px hsl(var(--glow-hue) 50% 70%),
+                  0 0 calc(var(--inset)*0.66) 5px hsl(var(--glow-hue) 100% 70%);
+      z-index:-1;
     }
     .glow-btn .shimmer::after {
-      box-shadow:
-        inset 0 0 0 1px hsl(var(--glow-hue) 70% 95%),
-        inset 0 0 2px 1px hsl(var(--glow-hue) 100% 80%),
-        inset 0 0 5px 2px hsl(var(--glow-hue) 100% 70%);
-      z-index: 2;
+      box-shadow: inset 0 0 0 1px hsl(var(--glow-hue) 70% 95%),
+                  inset 0 0 2px 1px hsl(var(--glow-hue) 100% 80%),
+                  inset 0 0 5px 2px hsl(var(--glow-hue) 100% 70%);
+      z-index:2;
     }
-
     .glow-btn .text {
-      position: relative;
-      z-index: 3;
-      color: #ffffff;
-      background-clip: text;
-      -webkit-background-clip: text;
-      background-color: var(--bg);
-      background-image: linear-gradient(
-        120deg,
-        transparent,
-        hsla(var(--glow-hue),100%,80%,0.66) 40%,
-        hsla(var(--glow-hue),100%,90%,.9) 50%,
-        transparent 52%
-      );
-      background-repeat: no-repeat;
-      background-size: 300% 300%;
-      background-position: center 200%;
+      position: relative; z-index: 3; color: #ffffff; background-clip: text; -webkit-background-clip: text;
+      background-image: linear-gradient(120deg, transparent, hsla(var(--glow-hue),100%,80%,.66) 40%, hsla(var(--glow-hue),100%,90%,.9) 50%, transparent 52%);
+      background-size: 300% 300%; background-position: center 200%;
     }
-    .glow-btn:hover .text,
-    .glow-btn.active .text {
-      animation: text .66s ease-in 1 both;
+    .glow-btn:hover .text { animation: text .66s ease-in 1 both; }
+
+    /* --------- Right column wrapper so badge is OUTSIDE the card --------- */
+    .qr-stack { display: flex; flex-direction: column; }
+    .qr-stack .card { margin: 0; }        /* no extra gap between card and badge container */
+    .warn-wrap {
+      margin-top: 14px;        /* space under the card */
+      padding: 0 0px;         /* inset like your screenshot */
     }
+    .warn-badge {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #2b1f0a 0%, #2c1f0b 100%);
+      border: 1px solid #6b4e0f;
+      color: #f7d07a;
+      font-size: 12px; line-height: 1.25; font-weight: 500;
+      box-shadow: 0 6px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+      user-select: none;
+    }
+    .warn-badge .dot {
+      width: 8px; height: 8px; max-height:8px; border-radius: 999px; background: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245,158,11,.15), 0 0 14px rgba(245,158,11,.8);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.4);opacity:.75;} }
   </style>
 </head>
 <body>
 <div class="wrap">
   <h1>CultureFly QR Builder</h1>
   <p class="sub-header">Exclusively for use by the Packaging and Marketing Teams</p>
+
   <div class="grid">
+    <!-- LEFT: Build URL -->
     <div class="card">
       <header>Build URL</header>
       <div class="content">
@@ -457,45 +296,23 @@
           </div>
         </div>
 
-        <!-- Advanced: UTM / Query Params -->
+        <!-- Advanced -->
         <details class="advanced" id="advDetails">
           <summary>Advanced: UTM / Query Params</summary>
-
-          <p class="muted" style="margin-top:-4px;margin-bottom:10px;">
-            Only non-empty fields are appended. Values are URL-encoded automatically.
-          </p>
+          <p class="muted" style="margin-top:-4px;margin-bottom:10px;">Only non-empty fields are appended. Values are URL-encoded automatically.</p>
 
           <div class="row2-3">
-            <div>
-              <label for="utm_source">utm_source</label>
-              <input id="utm_source" type="text" placeholder="e.g. qr" />
-            </div>
-            <div>
-              <label for="utm_medium">utm_medium</label>
-              <input id="utm_medium" type="text" placeholder="e.g. print" />
-            </div>
-            <div>
-              <label for="utm_campaign">utm_campaign</label>
-              <input id="utm_campaign" type="text" placeholder="e.g. nycc-2025" />
-            </div>
+            <div><label for="utm_source">utm_source</label><input id="utm_source" type="text" placeholder="e.g. qr" /></div>
+            <div><label for="utm_medium">utm_medium</label><input id="utm_medium" type="text" placeholder="e.g. print" /></div>
+            <div><label for="utm_campaign">utm_campaign</label><input id="utm_campaign" type="text" placeholder="e.g. nycc-2025" /></div>
           </div>
 
           <div class="row2-3" style="margin-top:14px">
-            <div>
-              <label for="utm_term">utm_term</label>
-              <input id="utm_term" type="text" placeholder="optional" />
-            </div>
-            <div>
-              <label for="utm_content">utm_content</label>
-              <input id="utm_content" type="text" placeholder="optional" />
-            </div>
-            <div>
-              <label for="utm_id">utm_id</label>
-              <input id="utm_id" type="text" placeholder="optional" />
-            </div>
+            <div><label for="utm_term">utm_term</label><input id="utm_term" type="text" placeholder="optional" /></div>
+            <div><label for="utm_content">utm_content</label><input id="utm_content" type="text" placeholder="optional" /></div>
+            <div><label for="utm_id">utm_id</label><input id="utm_id" type="text" placeholder="optional" /></div>
           </div>
 
-          <!-- Custom params -->
           <div style="margin-top:16px">
             <label>Custom Parameters</label>
             <div id="kvContainer"></div>
@@ -505,33 +322,39 @@
             </div>
           </div>
         </details>
-        <!-- /Advanced -->
       </div>
     </div>
 
-    <div class="card">
-      <header>QR Preview</header>
-      <div class="content">
-        <div class="qrWrap">
-          <div id="qr"></div>
-          <div class="tiny" id="qrNote">QR will appear here.</div>
-          <div class="btnrow">
-            <button id="pngBtn">Download PNG</button>
-
-            <!-- Glowing SVG button -->
-            <button id="svgBtn" class="glow-btn">
-              <span class="text">Download SVG</span>
-              <span class="shimmer" aria-hidden="true"></span>
-            </button>
-
-            <button id="pdfBtn">Download PDF</button>
+    <!-- RIGHT: QR card + OUTSIDE badge -->
+    <div class="qr-stack">
+      <div class="card">
+        <header>QR Preview</header>
+        <div class="content">
+          <div class="qrWrap">
+            <div id="qr"></div>
+            <div class="tiny" id="qrNote">QR will appear here.</div>
+            <div class="btnrow">
+              <button id="pngBtn">Download PNG</button>
+              <button id="svgBtn" class="glow-btn">
+                <span class="text">Download SVG</span>
+                <span class="shimmer" aria-hidden="true"></span>
+              </button>
+              <button id="pdfBtn">Download PDF</button>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <!-- NOW truly outside the card -->
+      <div class="warn-wrap">
+        <div id="warnBadge" class="warn-badge" role="status" aria-live="polite">
+          <span class="dot" aria-hidden="true"></span>
+          <span>Reminder: click <strong>Generate / Refresh Preview</strong> before downloading.</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Footer logo -->
   <div class="footer-logo">
     <img src="https://cdn.shopify.com/s/files/1/1393/2767/files/cf-builtby-stamp-01.svg" alt="Built by CultureFly">
   </div>
@@ -550,8 +373,8 @@ const PROPERTIES = [
 
 const FORM_FACTORS = [
   "3\" Bobbleheads","4.5\" Vinyl Figures (FlyGuys)","4.5\" Vinyl Figures w/ Acrylic (FlyGuys+)",
-"6\" Vinyl Figure","Bobbleheads","Corner Creature","Deluxe Vinyl Figure",
-"Flip 'Em's","Generic","Mystery Minis (Smols)","Nooks","Popcorn Buckets"
+  "6\" Vinyl Figure","Bobbleheads","Corner Creature","Deluxe Vinyl Figure",
+  "Flip 'Em's","Generic","Mystery Minis (Smols)","Nooks","Popcorn Buckets"
 ];
 
 /* ---------- Utils ---------- */
@@ -573,13 +396,13 @@ function mapFormFactorToSlug(label){
   const Lraw = (label || "").toLowerCase();
   const L = Lraw.replace(/"/g, "");
   if (L === "generic") return "";
-  if (L.startsWith("6 vinyl figure")) return "6-vinylfigure";
+  if (L.startsWith("6\" vinyl figure") || L.startsWith("6 vinyl figure")) return "6-vinylfigure";
   if (L.includes("bobblehead")) return "bobblehead";
   if (L.includes("flyguys")) return "vinylfigure-small";
   if (L.includes("mystery minis")) return "vinylfigure-mysterymini";
   if (L.includes("flip") && L.includes("em")) return "flipems";
   if (L.includes("deluxe") && L.includes("vinyl")) return "vinylfigure-deluxe";
-  if (L.includes("popcorn") && L.includes("buckets")) return "popcornbucket";
+  if (L.includes("popcorn") && L.includes("bucket")) return "popcornbucket";
   if (L.includes("corner") && L.includes("creature")) return "cornercreature";
   if (L === "nooks") return "nook";
   return slugify(label);
@@ -635,9 +458,7 @@ function buildQueryFromUTM(){
     utm_id:       getText(utmIdEl)
   };
 
-  Object.entries(std).forEach(([k,v]) => {
-    if (v) entries.push([k, v]);
-  });
+  Object.entries(std).forEach(([k,v]) => { if (v) entries.push([k, v]); });
 
   // custom kv rows
   const rows = kvContainer.querySelectorAll('.kv-row');
@@ -648,8 +469,6 @@ function buildQueryFromUTM(){
   });
 
   if (!entries.length) return "";
-
-  // Build query string
   const qs = entries.map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
   return `?${qs}`;
 }
@@ -663,10 +482,7 @@ function addKVRow(key="", val=""){
     <button type="button" class="removeKVBtn">Remove</button>
   `;
   row.addEventListener('input', refreshURL);
-  row.querySelector('.removeKVBtn').addEventListener('click', () => {
-    row.remove();
-    refreshURL();
-  });
+  row.querySelector('.removeKVBtn').addEventListener('click', () => { row.remove(); refreshURL(); });
   kvContainer.appendChild(row);
 }
 
@@ -709,11 +525,7 @@ function refreshURL(){
 /* ---------- QR ---------- */
 function qrOptions(size, margin, data, type="svg"){
   return {
-    width: size,
-    height: size,
-    data,
-    margin,
-    type,
+    width: size, height: size, data, margin, type,
     qrOptions: { errorCorrectionLevel: "Q" },
     dotsOptions: { type: "rounded", color: "#000000" },
     cornersSquareOptions: { type: "extra-rounded", color: "#000000" },
@@ -783,15 +595,12 @@ async function downloadPDF(){
   URL.revokeObjectURL(pngUrl);
 }
 
-/* ---------- Copy (robust) ---------- */
+/* ---------- Copy ---------- */
 function copyTextFallback(text){
   const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.setAttribute('readonly','');
-  ta.style.position = 'absolute';
-  ta.style.left = '-9999px';
-  document.body.appendChild(ta);
-  ta.select();
+  ta.value = text; ta.setAttribute('readonly','');
+  ta.style.position = 'absolute'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
   try { document.execCommand('copy'); } catch(e){}
   document.body.removeChild(ta);
 }
@@ -808,9 +617,7 @@ async function copyURLToClipboard(){
     const original = btn.textContent;
     btn.textContent = 'Copied!';
     setTimeout(() => btn.textContent = original, 1200);
-  }catch(err){
-    copyTextFallback(text);
-  }
+  }catch(err){ copyTextFallback(text); }
 }
 
 /* ---------- Events ---------- */
@@ -821,20 +628,15 @@ document.getElementById('pdfBtn').onclick  = downloadPDF;
 document.getElementById('copyBtn').onclick = copyURLToClipboard;
 document.getElementById('openBtn').onclick = () => window.open(refreshURL(), "_blank");
 
-[propertyEl, formFactorEl, extraEl].forEach(el => el.addEventListener('change', refreshURL));
+[propertyEl, formFactorEl, extraEl, sizeEl, marginEl].forEach(el => el.addEventListener('change', refreshURL));
 artistToggle.addEventListener('change', refreshURL);
 
-// UTM inputs
 [utmSourceEl, utmMediumEl, utmCampaignEl, utmTermEl, utmContentEl, utmIdEl].forEach(el => {
   el.addEventListener('input', refreshURL);
 });
 
-// Custom KV controls
 addKVBtn.addEventListener('click', () => addKVRow());
-clearKVBtn.addEventListener('click', () => {
-  kvContainer.innerHTML = "";
-  refreshURL();
-});
+clearKVBtn.addEventListener('click', () => { kvContainer.innerHTML = ""; refreshURL(); });
 
 /* ---------- Init ---------- */
 refreshURL();
