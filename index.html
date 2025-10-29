@@ -447,9 +447,9 @@ const PROPERTIES = [
 ];
 
 const FORM_FACTORS = [
-  "3\" Bobbleheads","4.5\" Vinyl Figures (FLYGUYS)","4.5\" Vinyl Figures w/ Acrylic (FLYGUYS+)",
-"6\" Vinyl Figure","Bobbleheads","Corner Creature","Deluxe Vinyl Figure",
-"Flip 'Em's","Generic","Mystery Minis (Smols)","Nooks","Popcorn Buckets"
+  "Nooks","Deluxe Vinyl Figure","Mystery Minis (Smols)","6\" Vinyl Figure",
+  "4.5\" Vinyl Figures (FLYGUYS)","4.5\" Vinyl Figures w/ Acrylic (FLYGUYS+)",
+  "Flip 'Em's","Generic","Bobbleheads","3\" Bobbleheads","Popcorn Bucket","Corner Creature"
 ];
 
 /* ---------- Utils ---------- */
@@ -477,7 +477,7 @@ function mapFormFactorToSlug(label){
   if (L.includes("mystery minis")) return "vinylfigure-mysterymini";
   if (L.includes("flip") && L.includes("em")) return "flipems";
   if (L.includes("deluxe") && L.includes("vinyl")) return "vinylfigure-deluxe";
-  if (L.includes("popcorn") && L.includes("buckets")) return "popcornbucket";
+  if (L.includes("popcorn") && L.includes("bucket")) return "popcornbucket";
   if (L.includes("corner") && L.includes("creature")) return "cornercreature";
   if (L === "nooks") return "nook";
   return slugify(label);
