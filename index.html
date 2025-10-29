@@ -150,6 +150,7 @@
       padding: 12px 14px;
       overflow: auto;
       font-family: ui-monospace, Menlo, Consolas, monospace;
+      word-break: break-all;
     }
 
     .btnrow {
@@ -226,10 +227,10 @@
     .slider:before {
       content: "";
       position: absolute;
-      height: 22px;
-      width: 22px;
-      left: 5px;
-      top: 3px;
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      top: 4px;
       background: white;
       border-radius: 50%;
       transition: transform .2s;
@@ -247,6 +248,46 @@
     .footer-logo img {
       width: 120px;
       opacity: 0.9;
+    }
+
+    /* Details (Advanced) */
+    details.advanced {
+      border-top: 1px solid #1e2530;
+      margin-top: 16px;
+      padding-top: 12px;
+    }
+    details.advanced summary {
+      list-style: none;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    details.advanced summary::before {
+      content: "▸";
+      font-size: 14px;
+      color: var(--muted);
+      transform: translateY(-1px);
+      transition: transform .2s;
+    }
+    details.advanced[open] summary::before { transform: rotate(90deg) translateX(-2px); }
+
+    .muted { color: var(--muted); font-size: 12px; }
+
+    .row2-3 {
+      display: grid; gap: 14px; grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .kv-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .kv-row button {
+      white-space: nowrap;
     }
 
     /* -----------------------------
@@ -404,6 +445,56 @@
             <button class="primary" id="makeBtn">Generate / Refresh Preview</button>
           </div>
         </div>
+
+        <!-- Advanced: UTM / Query Params -->
+        <details class="advanced" id="advDetails">
+          <summary>Advanced: UTM / Query Params</summary>
+
+          <p class="muted" style="margin-top:-4px;margin-bottom:10px;">
+            Only non-empty fields are appended. Values are URL-encoded automatically.
+          </p>
+
+          <div class="row2-3">
+            <div>
+              <label for="utm_source">utm_source</label>
+              <input id="utm_source" type="text" placeholder="e.g. qr" />
+            </div>
+            <div>
+              <label for="utm_medium">utm_medium</label>
+              <input id="utm_medium" type="text" placeholder="e.g. print" />
+            </div>
+            <div>
+              <label for="utm_campaign">utm_campaign</label>
+              <input id="utm_campaign" type="text" placeholder="e.g. nycc-2025" />
+            </div>
+          </div>
+
+          <div class="row2-3" style="margin-top:14px">
+            <div>
+              <label for="utm_term">utm_term</label>
+              <input id="utm_term" type="text" placeholder="optional" />
+            </div>
+            <div>
+              <label for="utm_content">utm_content</label>
+              <input id="utm_content" type="text" placeholder="optional" />
+            </div>
+            <div>
+              <label for="utm_id">utm_id</label>
+              <input id="utm_id" type="text" placeholder="optional" />
+            </div>
+          </div>
+
+          <!-- Custom params -->
+          <div style="margin-top:16px">
+            <label>Custom Parameters</label>
+            <div id="kvContainer"></div>
+            <div class="btnrow btnrow--left" style="margin-top:8px">
+              <button id="addKVBtn" type="button">Add Custom Param</button>
+              <button id="clearKVBtn" type="button">Clear Custom Params</button>
+            </div>
+          </div>
+        </details>
+        <!-- /Advanced -->
       </div>
     </div>
 
@@ -494,6 +585,17 @@ const urlOut       = document.getElementById('urlOut');
 const qrNode       = document.getElementById('qr');
 const qrNote       = document.getElementById('qrNote');
 
+const utmSourceEl   = document.getElementById('utm_source');
+const utmMediumEl   = document.getElementById('utm_medium');
+const utmCampaignEl = document.getElementById('utm_campaign');
+const utmTermEl     = document.getElementById('utm_term');
+const utmContentEl  = document.getElementById('utm_content');
+const utmIdEl       = document.getElementById('utm_id');
+
+const kvContainer = document.getElementById('kvContainer');
+const addKVBtn    = document.getElementById('addKVBtn');
+const clearKVBtn  = document.getElementById('clearKVBtn');
+
 function addOptions(el, items){
   const frag = document.createDocumentFragment();
   items.forEach(v => {
@@ -507,10 +609,60 @@ function addOptions(el, items){
 addOptions(propertyEl, PROPERTIES);
 addOptions(formFactorEl, FORM_FACTORS);
 
+/* ---------- Advanced Params ---------- */
+function getText(el){ return (el?.value ?? "").trim(); }
+
+function buildQueryFromUTM(){
+  const entries = [];
+
+  const std = {
+    utm_source:   getText(utmSourceEl),
+    utm_medium:   getText(utmMediumEl),
+    utm_campaign: getText(utmCampaignEl),
+    utm_term:     getText(utmTermEl),
+    utm_content:  getText(utmContentEl),
+    utm_id:       getText(utmIdEl)
+  };
+
+  Object.entries(std).forEach(([k,v]) => {
+    if (v) entries.push([k, v]);
+  });
+
+  // custom kv rows
+  const rows = kvContainer.querySelectorAll('.kv-row');
+  rows.forEach(row => {
+    const key = row.querySelector('input[data-kv="key"]')?.value.trim();
+    const val = row.querySelector('input[data-kv="val"]')?.value.trim();
+    if (key && val) entries.push([key, val]);
+  });
+
+  if (!entries.length) return "";
+
+  // Build query string
+  const qs = entries.map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+  return `?${qs}`;
+}
+
+function addKVRow(key="", val=""){
+  const row = document.createElement('div');
+  row.className = 'kv-row';
+  row.innerHTML = `
+    <input type="text" data-kv="key" placeholder="key" value="${key.replace(/"/g,'&quot;')}" />
+    <input type="text" data-kv="val" placeholder="value" value="${val.replace(/"/g,'&quot;')}" />
+    <button type="button" class="removeKVBtn">Remove</button>
+  `;
+  row.addEventListener('input', refreshURL);
+  row.querySelector('.removeKVBtn').addEventListener('click', () => {
+    row.remove();
+    refreshURL();
+  });
+  kvContainer.appendChild(row);
+}
+
 /* ---------- URL Builder ---------- */
 function artistOn(){ return artistToggle.checked; }
 
-function buildURL(){
+function buildPath(){
   const base = "https://culturefly.com/";
   const propertySlug = slugify(propertyEl.value || "");
   let mappedForm = mapFormFactorToSlug(formFactorEl.value || "");
@@ -529,6 +681,12 @@ function buildURL(){
   if (isArtist && !insertedAfterVF) parts.push("artist");
 
   return base + parts.join("-");
+}
+
+function buildURL(){
+  const path = buildPath();
+  const query = buildQueryFromUTM();
+  return path + query;
 }
 
 function refreshURL(){
@@ -654,6 +812,18 @@ document.getElementById('openBtn').onclick = () => window.open(refreshURL(), "_b
 
 [propertyEl, formFactorEl, extraEl].forEach(el => el.addEventListener('change', refreshURL));
 artistToggle.addEventListener('change', refreshURL);
+
+// UTM inputs
+[utmSourceEl, utmMediumEl, utmCampaignEl, utmTermEl, utmContentEl, utmIdEl].forEach(el => {
+  el.addEventListener('input', refreshURL);
+});
+
+// Custom KV controls
+addKVBtn.addEventListener('click', () => addKVRow());
+clearKVBtn.addEventListener('click', () => {
+  kvContainer.innerHTML = "";
+  refreshURL();
+});
 
 /* ---------- Init ---------- */
 refreshURL();
