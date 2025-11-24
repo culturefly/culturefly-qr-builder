@@ -408,6 +408,7 @@ function mapPropertyToSlug(property) {
 function mapFormFactorToSlug(label){
   const Lraw = (label || "").toLowerCase();
   const L = Lraw.replace(/"/g, "");
+
   if (L === "generic") return "";
   if (L.startsWith("6\" vinyl figure") || L.startsWith("6 vinyl figure")) return "6-vinylfigure";
   if (L.includes("bobblehead")) return "bobblehead";
@@ -418,8 +419,11 @@ function mapFormFactorToSlug(label){
   if (L.includes("popcorn") && L.includes("bucket")) return "popcornbucket";
   if (L.includes("corner") && L.includes("creature")) return "cornercreature";
   if (L === "nooks") return "nook";
+  if (L.includes("critter") && L.includes("crate")) return "crittercrates";
+
   return slugify(label);
 }
+
 
 /* ---------- DOM ---------- */
 const propertyEl   = document.getElementById('property');
