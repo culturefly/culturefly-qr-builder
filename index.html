@@ -409,6 +409,7 @@ function mapFormFactorToSlug(label){
   const Lraw = (label || "").toLowerCase();
   const L = Lraw.replace(/"/g, "");
 
+  if (L === "meltz") return "meltz"; // or whatever slug you need
   if (L === "generic") return "";
   if (L.startsWith("6\" vinyl figure") || L.startsWith("6 vinyl figure")) return "6-vinylfigure";
   if (L.includes("bobblehead")) return "bobblehead";
@@ -423,6 +424,7 @@ function mapFormFactorToSlug(label){
 
   return slugify(label);
 }
+
 
 
 /* ---------- DOM ---------- */
