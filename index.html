@@ -182,14 +182,183 @@
     .kv-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-top: 10px; }
     .kv-row button { white-space: nowrap; }
 
+    /* Glow button */
+    .glow-btn { --inset: 40px; position: relative; isolation: isolate; color: #fff !important; background: #121721; padding: .8em 1.4em; border-radius: 80px; }
+    .glow-btn:hover:not(:active) { box-shadow: 0 4px 8px -2px hsl(var(--glow-hue) 50% 20% / 50%); }
+    .glow-btn .shimmer {
+      position: absolute; inset: calc(var(--inset) * -1); border-radius: inherit; pointer-events: none;
+      mask-image: conic-gradient(from var(--shimmer,0deg), transparent 0% 20%, black 36% 45%, transparent 50% 70%, black 85% 95%, transparent 100%);
+      mix-blend-mode: plus-lighter; animation: shimmer 1s linear infinite both; z-index: 1;
+    }
+    .glow-btn:hover .shimmer::before, .glow-btn:hover .shimmer::after { opacity: 1; animation: shine 1.2s ease-in 1 forwards; }
+    .glow-btn .shimmer::before, .glow-btn .shimmer::after {
+      opacity: 0; content: ""; border-radius: inherit; position: absolute; inset: var(--inset); pointer-events: none; transition: all .5s ease;
+    }
+    .glow-btn .shimmer::before {
+      box-shadow: 0 0 calc(var(--inset)*0.1) 2px hsl(var(--glow-hue) 20% 95%),
+                  0 0 calc(var(--inset)*0.18) 4px hsl(var(--glow-hue) 20% 80%),
+                  0 0 calc(var(--inset)*0.33) 4px hsl(var(--glow-hue) 50% 70%),
+                  0 0 calc(var(--inset)*0.66) 5px hsl(var(--glow-hue) 100% 70%);
+      z-index:-1;
+    }
+    .glow-btn .shimmer::after {
+      box-shadow: inset 0 0 0 1px hsl(var(--glow-hue) 70% 95%),
+                  inset 0 0 2px 1px hsl(var(--glow-hue) 100% 80%),
+                  inset 0 0 5px 2px hsl(var(--glow-hue) 100% 70%);
+      z-index:2;
+    }
+    .glow-btn .text {
+      position: relative; z-index: 3; color: #ffffff; background-clip: text; -webkit-background-clip: text;
+      background-image: linear-gradient(120deg, transparent, hsla(var(--glow-hue),100%,80%,.66) 40%, hsla(var(--glow-hue),100%,90%,.9) 50%, transparent 52%);
+      background-size: 300% 300%; background-position: center 200%;
+    }
+    .glow-btn:hover .text { animation: text .66s ease-in 1 both; }
+
+    /* --------- Right column wrapper so badge is OUTSIDE the card --------- */
     .qr-stack { display: flex; flex-direction: column; }
     .qr-stack .card { margin: 0; }
-    .warn-wrap { margin-top: 14px; }
+    .warn-wrap {
+      margin-top: 14px;
+      padding: 0 0px;
+    }
+    .warn-badge {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #2b1f0a 0%, #2c1f0b 100%);
+      border: 1px solid #6b4e0f;
+      color: #f7d07a;
+      font-size: 12px; line-height: 1.25; font-weight: 500;
+      box-shadow: 0 6px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+      user-select: none;
+    }
+    .warn-badge .dot {
+      width: 8px; height: 8px; max-height:8px; border-radius: 999px; background: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245,158,11,.15), 0 0 14px rgba(245,158,11,.8);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.4);opacity:.75;} }
   </style>
 </head>
 <body>
+<div class="wrap">
+  <h1>CultureFly QR Builder</h1>
+  <p class="sub-header">Exclusively for use by the Packaging and Marketing Teams</p>
 
-<!-- (HTML BODY UNCHANGED — EXACT SAME AS YOUR ORIGINAL) -->
+  <div class="grid">
+    <!-- LEFT: Build URL -->
+    <div class="card">
+      <header>Build URL</header>
+      <div class="content">
+        <div class="row">
+          <div>
+            <label for="property">Property</label>
+            <select id="property"></select>
+          </div>
+          <div>
+            <label for="formFactor">Form Factor</label>
+            <select id="formFactor"></select>
+          </div>
+        </div>
+
+        <div class="toggle-wrap">
+          <span class="toggle-label">Artist Series</span>
+          <label class="switch">
+            <input type="checkbox" id="artistToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="row3" style="margin-top:14px">
+          <div>
+            <label for="extra">Additional Parameter</label>
+            <input id="extra" type="text" placeholder="e.g. nycc" />
+          </div>
+          <div>
+            <label for="size">Export size (px)</label>
+            <input id="size" type="number" min="256" max="4096" step="32" value="1200" />
+          </div>
+          <div>
+            <label for="margin">Quiet zone (px)</label>
+            <input id="margin" type="number" min="0" max="50" step="1" value="8" />
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <label>Resulting URL</label>
+          <div class="urlbox">
+            <div class="url" id="urlOut">https://culturefly.com/</div>
+          </div>
+          <div class="btnrow btnrow--left">
+            <button id="copyBtn">Copy URL</button>
+            <button id="openBtn">Open URL</button>
+            <button class="primary" id="makeBtn">Generate / Refresh Preview</button>
+          </div>
+        </div>
+
+        <!-- Advanced -->
+        <details class="advanced" id="advDetails">
+          <summary>Advanced: UTM / Query Params</summary>
+          <p class="muted" style="margin-top:-4px;margin-bottom:10px;">Only non-empty fields are appended. Values are URL-encoded automatically.</p>
+
+          <div class="row2-3">
+            <div><label for="utm_source">utm_source</label><input id="utm_source" type="text" placeholder="e.g. qr" /></div>
+            <div><label for="utm_medium">utm_medium</label><input id="utm_medium" type="text" placeholder="e.g. print" /></div>
+            <div><label for="utm_campaign">utm_campaign</label><input id="utm_campaign" type="text" placeholder="e.g. nycc-2025" /></div>
+          </div>
+
+          <div class="row2-3" style="margin-top:14px">
+            <div><label for="utm_term">utm_term</label><input id="utm_term" type="text" placeholder="optional" /></div>
+            <div><label for="utm_content">utm_content</label><input id="utm_content" type="text" placeholder="optional" /></div>
+            <div><label for="utm_id">utm_id</label><input id="utm_id" type="text" placeholder="optional" /></div>
+          </div>
+
+          <div style="margin-top:16px">
+            <label>Custom Parameters</label>
+            <div id="kvContainer"></div>
+            <div class="btnrow btnrow--left" style="margin-top:8px">
+              <button id="addKVBtn" type="button">Add Custom Param</button>
+              <button id="clearKVBtn" type="button">Clear Custom Params</button>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <!-- RIGHT: QR card + OUTSIDE badge -->
+    <div class="qr-stack">
+      <div class="card">
+        <header>QR Preview</header>
+        <div class="content">
+          <div class="qrWrap">
+            <div id="qr"></div>
+            <div class="tiny" id="qrNote">QR will appear here.</div>
+            <div class="btnrow">
+              <button id="pngBtn">Download PNG</button>
+              <button id="svgBtn" class="glow-btn">
+                <span class="text">Download SVG</span>
+                <span class="shimmer" aria-hidden="true"></span>
+              </button>
+              <button id="pdfBtn">Download PDF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOW truly outside the card -->
+      <div class="warn-wrap">
+        <div id="warnBadge" class="warn-badge" role="status" aria-live="polite">
+          <span class="dot" aria-hidden="true"></span>
+          <span>Reminder: click <strong>Generate / Refresh Preview</strong> before downloading.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-logo">
+    <img src="https://cdn.shopify.com/s/files/1/1393/2767/files/cf-builtby-stamp-01.svg" alt="Built by CultureFly">
+  </div>
+</div>
 
 <script>
 /* ---------- Data ---------- */
@@ -206,10 +375,10 @@ const PROPERTIES = [
 const FORM_FACTORS = [
   "Generic","3\" Bobbleheads","4.5\" Vinyl Figures (FlyGuys)","4.5\" Vinyl Figures w/ Acrylic (FlyGuys+)",
   "6\" Vinyl Figure","Bobbleheads","Corner Creature","Critter Crates","Deluxe Vinyl Figure",
-  "Flip 'Em's","Meltz","Mystery Minis (Smols)","Nooks","Popcorn Buckets",
-  "Deluxe Bag Clips" // ✅ ADDED
+  "Flip 'Em's","Meltz","Mystery Minis (Smols)","Nooks","Popcorn Buckets"
 ];
 
+/* ---------- Utils ---------- */
 function slugify(input){
   if(!input) return "";
   return input
@@ -224,24 +393,273 @@ function slugify(input){
     .toLowerCase();
 }
 
-function mapFormFactorToSlug(label){
-  const L = (label || "").toLowerCase();
+// Special mapping for properties that need non-standard slugs
+function mapPropertyToSlug(property) {
+  if (!property) return "";
+  const lower = property.toLowerCase();
+  // force Monsters, Inc. to "monsters-inc"
+  if (lower.includes("monsters") && lower.includes("inc")) {
+    return "monsters-inc";
+  }
+  // everything else = normal slug
+  return slugify(property);
+}
 
-  if (L === "meltz") return "meltz";
+function mapFormFactorToSlug(label){
+  const Lraw = (label || "").toLowerCase();
+  const L = Lraw.replace(/"/g, "");
+
+  if (L === "meltz") return "meltz"; // or whatever slug you need
   if (L === "generic") return "";
+  if (L.startsWith("6\" vinyl figure") || L.startsWith("6 vinyl figure")) return "6-vinylfigure";
   if (L.includes("bobblehead")) return "bobblehead";
   if (L.includes("flyguys")) return "vinylfigure-small";
+  if (L.includes("mystery minis")) return "vinylfigure-mysterymini";
+  if (L.includes("flip") && L.includes("em")) return "flipems";
   if (L.includes("deluxe") && L.includes("vinyl")) return "vinylfigure-deluxe";
-  if (L.includes("popcorn")) return "popcornbucket";
-
-  // ✅ NEW
-  if (L.includes("deluxe") && L.includes("bag") && L.includes("clip")) {
-    return "bagclip-deluxe";
-  }
+  if (L.includes("popcorn") && L.includes("bucket")) return "popcornbucket";
+  if (L.includes("corner") && L.includes("creature")) return "cornercreature";
+  if (L === "nooks") return "nook";
+  if (L.includes("critter") && L.includes("crate")) return "crittercrates";
 
   return slugify(label);
 }
-</script>
 
+
+
+/* ---------- DOM ---------- */
+const propertyEl   = document.getElementById('property');
+const formFactorEl = document.getElementById('formFactor');
+const artistToggle = document.getElementById('artistToggle');
+const extraEl      = document.getElementById('extra');
+const sizeEl       = document.getElementById('size');
+const marginEl     = document.getElementById('margin');
+const urlOut       = document.getElementById('urlOut');
+const qrNode       = document.getElementById('qr');
+const qrNote       = document.getElementById('qrNote');
+
+const utmSourceEl   = document.getElementById('utm_source');
+const utmMediumEl   = document.getElementById('utm_medium');
+const utmCampaignEl = document.getElementById('utm_campaign');
+const utmTermEl     = document.getElementById('utm_term');
+const utmContentEl  = document.getElementById('utm_content');
+const utmIdEl       = document.getElementById('utm_id');
+
+const kvContainer = document.getElementById('kvContainer');
+const addKVBtn    = document.getElementById('addKVBtn');
+const clearKVBtn  = document.getElementById('clearKVBtn');
+
+function addOptions(el, items){
+  const frag = document.createDocumentFragment();
+  items.forEach(v => {
+    const o = document.createElement('option');
+    o.textContent = v;
+    o.value = v;
+    frag.appendChild(o);
+  });
+  el.appendChild(frag);
+}
+addOptions(propertyEl, PROPERTIES);
+addOptions(formFactorEl, FORM_FACTORS);
+
+/* ---------- Advanced Params ---------- */
+function getText(el){ return (el?.value ?? "").trim(); }
+
+function buildQueryFromUTM(){
+  const entries = [];
+
+  const std = {
+    utm_source:   getText(utmSourceEl),
+    utm_medium:   getText(utmMediumEl),
+    utm_campaign: getText(utmCampaignEl),
+    utm_term:     getText(utmTermEl),
+    utm_content:  getText(utmContentEl),
+    utm_id:       getText(utmIdEl)
+  };
+
+  Object.entries(std).forEach(([k,v]) => { if (v) entries.push([k, v]); });
+
+  // custom kv rows
+  const rows = kvContainer.querySelectorAll('.kv-row');
+  rows.forEach(row => {
+    const key = row.querySelector('input[data-kv="key"]')?.value.trim();
+    const val = row.querySelector('input[data-kv="val"]')?.value.trim();
+    if (key && val) entries.push([key, val]);
+  });
+
+  if (!entries.length) return "";
+  const qs = entries.map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+  return `?${qs}`;
+}
+
+function addKVRow(key="", val=""){
+  const row = document.createElement('div');
+  row.className = 'kv-row';
+  row.innerHTML = `
+    <input type="text" data-kv="key" placeholder="key" value="${key.replace(/"/g,'&quot;')}" />
+    <input type="text" data-kv="val" placeholder="value" value="${val.replace(/"/g,'&quot;')}" />
+    <button type="button" class="removeKVBtn">Remove</button>
+  `;
+  row.addEventListener('input', refreshURL);
+  row.querySelector('.removeKVBtn').addEventListener('click', () => { row.remove(); refreshURL(); });
+  kvContainer.appendChild(row);
+}
+
+/* ---------- URL Builder ---------- */
+function artistOn(){ return artistToggle.checked; }
+
+function buildPath(){
+  const base = "https://culturefly.com/";
+  const propertySlug = mapPropertyToSlug(propertyEl.value || "");
+  let mappedForm = mapFormFactorToSlug(formFactorEl.value || "");
+  const extra = slugify(extraEl.value || "");
+  const isArtist = artistOn();
+
+  let insertedAfterVF = false;
+  if (isArtist && mappedForm && mappedForm.includes("vinylfigure")){
+    mappedForm = mappedForm.replace(/vinylfigure(?!-artist)/,"vinylfigure-artist");
+    insertedAfterVF = true;
+  }
+
+  const parts = ["insertcard", propertySlug];
+  if (mappedForm) parts.push(mappedForm);
+  if (extra) parts.push(extra);
+  if (isArtist && !insertedAfterVF) parts.push("artist");
+
+  return base + parts.join("-");
+}
+
+function buildURL(){
+  const path = buildPath();
+  const query = buildQueryFromUTM();
+  return path + query;
+}
+
+function refreshURL(){
+  const url = buildURL();
+  urlOut.textContent = url;
+  return url;
+}
+
+/* ---------- QR ---------- */
+function qrOptions(size, margin, data, type="svg"){
+  return {
+    width: size, height: size, data, margin, type,
+    qrOptions: { errorCorrectionLevel: "Q" },
+    dotsOptions: { type: "rounded", color: "#000000" },
+    cornersSquareOptions: { type: "extra-rounded", color: "#000000" },
+    cornersDotOptions: { type: "dot", color: "#000000" },
+    backgroundOptions: { color: "#ffffff" }
+  };
+}
+
+const PREVIEW_SIZE = 400;
+
+function makePreview(){
+  const data  = refreshURL();
+  const quiet = Math.max(0, Math.min(50, parseInt(marginEl.value || "8", 10)));
+  qrNode.innerHTML = "";
+  const qr = new QRCodeStyling(qrOptions(PREVIEW_SIZE, quiet, data, "svg"));
+  qr.append(qrNode);
+  qrNote.textContent = "QR generated for: " + data;
+}
+
+/* ---------- Downloads ---------- */
+function triggerDownload(blob, filename){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+async function downloadPNG(){
+  const data  = refreshURL();
+  const size  = parseInt(sizeEl.value || "1200", 10);
+  const quiet = parseInt(marginEl.value || "8", 10);
+  const qr    = new QRCodeStyling(qrOptions(size, quiet, data, "canvas"));
+  const blob  = await qr.getRawData("png");
+  triggerDownload(blob, "culturefly-qr.png");
+}
+
+async function downloadSVG(){
+  const data  = refreshURL();
+  const size  = parseInt(sizeEl.value || "1200", 10);
+  const quiet = parseInt(marginEl.value || "8", 10);
+  const qr    = new QRCodeStyling(qrOptions(size, quiet, data, "svg"));
+  const blob  = await qr.getRawData("svg");
+  triggerDownload(blob, "culturefly-qr.svg");
+}
+
+async function downloadPDF(){
+  const data     = refreshURL();
+  const baseSize = parseInt(sizeEl.value || "1200", 10);
+  const quiet    = parseInt(marginEl.value || "8", 10);
+  const px       = baseSize * 3;
+  const qr       = new QRCodeStyling(qrOptions(px, quiet * 3, data, "canvas"));
+  const pngBlob  = await qr.getRawData("png");
+  const pngUrl   = URL.createObjectURL(pngBlob);
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "p", unit: "px", format: [px, px] });
+  await new Promise(res => {
+    const img = new Image();
+    img.onload = () => { doc.addImage(img, "PNG", 0, 0, px, px); res(); };
+    img.src = pngUrl;
+  });
+  const pdfBlob = doc.output("blob");
+  triggerDownload(pdfBlob, "culturefly-qr.pdf");
+  URL.revokeObjectURL(pngUrl);
+}
+
+/* ---------- Copy ---------- */
+function copyTextFallback(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly','');
+  ta.style.position = 'absolute'; ta.style.left = '-9999px';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+}
+
+async function copyURLToClipboard(){
+  const text = refreshURL();
+  try{
+    if (navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+    } else {
+      copyTextFallback(text);
+    }
+    const btn = document.getElementById('copyBtn');
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = original, 1200);
+  }catch(err){ copyTextFallback(text); }
+}
+
+/* ---------- Events ---------- */
+document.getElementById('makeBtn').onclick = makePreview;
+document.getElementById('pngBtn').onclick  = downloadPNG;
+document.getElementById('svgBtn').onclick  = downloadSVG;
+document.getElementById('pdfBtn').onclick  = downloadPDF;
+document.getElementById('copyBtn').onclick = copyURLToClipboard;
+document.getElementById('openBtn').onclick = () => window.open(refreshURL(), "_blank");
+
+[propertyEl, formFactorEl, extraEl, sizeEl, marginEl].forEach(el => el.addEventListener('change', refreshURL));
+artistToggle.addEventListener('change', refreshURL);
+
+[utmSourceEl, utmMediumEl, utmCampaignEl, utmTermEl, utmContentEl, utmIdEl].forEach(el => {
+  el.addEventListener('input', refreshURL);
+});
+
+addKVBtn.addEventListener('click', () => addKVRow());
+clearKVBtn.addEventListener('click', () => { kvContainer.innerHTML = ""; refreshURL(); });
+
+/* ---------- Init ---------- */
+refreshURL();
+makePreview();
+</script>
 </body>
 </html>
