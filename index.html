@@ -374,7 +374,7 @@ const PROPERTIES = [
 
 const FORM_FACTORS = [
   "Generic","3\" Bobbleheads","4.5\" Vinyl Figures (FlyGuys)","4.5\" Vinyl Figures w/ Acrylic (FlyGuys+)",
-  "6\" Vinyl Figure","Bobbleheads","Corner Creature","Critter Crates","Deluxe Vinyl Figure",
+  "6\" Vinyl Figure","Bobbleheads","Corner Creature","Critter Crates","Deluxe Bag Clips","Deluxe Vinyl Figure",
   "Flip 'Em's","Meltz","Mystery Minis (Smols)","Nooks","Popcorn Buckets"
 ];
 
@@ -416,6 +416,7 @@ function mapFormFactorToSlug(label){
   if (L.includes("flyguys")) return "vinylfigure-small";
   if (L.includes("mystery minis")) return "vinylfigure-mysterymini";
   if (L.includes("flip") && L.includes("em")) return "flipems";
+  if (L.includes("deluxe") && L.includes("bag clips")) return "bagclips-deluxe";
   if (L.includes("deluxe") && L.includes("vinyl")) return "vinylfigure-deluxe";
   if (L.includes("popcorn") && L.includes("bucket")) return "popcornbucket";
   if (L.includes("corner") && L.includes("creature")) return "cornercreature";
