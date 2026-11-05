@@ -9,7 +9,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;400;600&family=Rubik:wght@400;500&display=swap" rel="stylesheet">
 
   <!-- qr-code-styling -->
-  <script src="https://unpkg.com/qr-code-styling@1.8.2/lib/qr-code-styling.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.8.2/lib/qr-code-styling.js"></script>
+  <script>
+    if (typeof QRCodeStyling === "undefined") {
+      document.write('<script src="https://unpkg.com/qr-code-styling@1.8.2/lib/qr-code-styling.js"><\/script>');
+    }
+  </script>
   <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
 
@@ -363,10 +368,10 @@
 <script>
 /* ---------- Data ---------- */
 const PROPERTIES = [
-  "Generic","Adventure Time","Alien","Aristocats","Astro Bot","Bob's Burgers","Chainsaw Man","Chucky",
+  "Generic","Adventure Time","Alien","Aristocats","Astro Bot","Bob's Burgers","Cars","Chainsaw Man","Chucky",
   "Coraline","Corpse Bride","Dr. Seuss Cat in the Hat","Dr. Seuss The Grinch","Dandy's World",
-  "Disney Cats","Family Guy","Futurama","Ghostface","Gremlins","Halloween","Harry Potter","How To Train Your Dragon",
-  "Invader Zim","It","Jujutsu Kaisen","Lilo & Stitch","Moana","Molang","Monsters, Inc.","Mortal Kombat",
+  "Disney Cats","Family Guy","Fourth Wing","Futurama","Ghostface","Gremlins","Halloween","Harry Potter","How To Train Your Dragon",
+  "Invader Zim","It","Jujutsu Kaisen","King of the Hill","Lilo & Stitch","Moana","Molang","Monsters, Inc.","Mortal Kombat",
   "Nightmare Before Christmas","One Piece","Peanuts","Phineas and Ferb","Powerpuff Girls","Pusheen","Rick & Morty","Shrek","Solo Leveling","South Park",
   "SpongeBob","Stranger Things","Texas Chainsaw Massacre","The Last of Us","Toy Story",
   "Transformers","Universal Horror","Wicked","Winnie-the-Pooh"
@@ -558,6 +563,10 @@ const PREVIEW_SIZE = 400;
 
 function makePreview(){
   const data  = refreshURL();
+  if (typeof QRCodeStyling === "undefined"){
+    qrNote.textContent = "QR library failed to load. Check your connection and reload.";
+    return;
+  }
   const quiet = Math.max(0, Math.min(50, parseInt(marginEl.value || "8", 10)));
   qrNode.innerHTML = "";
   const qr = new QRCodeStyling(qrOptions(PREVIEW_SIZE, quiet, data, "svg"));
